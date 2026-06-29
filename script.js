@@ -220,7 +220,7 @@ document.getElementById("confirmBtn").addEventListener("click", () => {
     } 
     // Option B: If this is a direct web page redirect
     else {
-        const parentUrl = `https://yourparentwebsite.com/checkout?lat=${selectedLocation.latitude}&lng=${selectedLocation.longitude}&address=${encodeURIComponent(selectedLocation.address)}`;
+        const parentUrl = `https://dasein.flutterflow.app/savenewaddress?lat=${selectedLocation.latitude}&lng=${selectedLocation.longitude}&address=${encodeURIComponent(selectedLocation.address)}`;
         window.location.href = parentUrl;
     }
 });
