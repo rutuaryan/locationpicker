@@ -1,1 +1,56 @@
+<!DOCTYPE html>
 
+<html>
+
+<head>
+
+<meta charset="utf-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1">
+
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.css" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div id="map"></div>
+
+<img
+id="pin"
+src="https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png">
+
+<div id="searchBox">
+
+<input
+id="searchInput"
+placeholder="Search area or address">
+
+</div>
+
+<div id="bottomSheet">
+
+<h3 id="title">
+Loading...
+</h3>
+
+<p id="address">
+Fetching address...
+</p>
+
+<button id="confirmBtn">
+Confirm & Proceed
+</button>
+
+</div>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.js"></script>
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
