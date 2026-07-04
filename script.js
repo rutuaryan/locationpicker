@@ -1,5 +1,12 @@
 mapboxgl.accessToken = 'pk.eyJ1IjoiZGFzZWluaG9tZWNzIiwiYSI6ImNtcXl3d3R0MjAwYXoycXF2MTNqcjFqaWIifQ.a77W_SYHwiw1Ng4d01Ma9Q';
 
+// ----------------------------------------------------
+// 1. EXTRACT URL PARAMETERS
+// ----------------------------------------------------
+const urlParams = new URLSearchParams(window.location.search);
+const targetRowId = urlParams.get('rowid'); 
+console.log("Loaded with Target Row ID:", targetRowId);
+
 // Create map
 const map = new mapboxgl.Map({
     container: "map",
@@ -126,7 +133,6 @@ searchInput.addEventListener("input", () => {
             suggestionContainer.innerHTML = "";
 
             if (data.features && data.features.length > 0) {
-                // Keep the dropdown width matching the input field precisely
                 suggestionContainer.style.width = `${searchInput.getBoundingClientRect().width}px`;
                 suggestionContainer.style.display = "block";
 
@@ -178,7 +184,6 @@ document.addEventListener("click", (e) => {
 
 // --- MAP LOAD & LIFECYCLE ---
 
-// Map Loaded
 map.on("load", () => {
     updateAddress();
 
@@ -199,28 +204,62 @@ map.on("load", () => {
     }
 });
 
-// Update address after dragging stops
 map.on("moveend", () => {
     updateAddress();
 });
 
-// --- CONFIRM & REDIRECT ---
-document.getElementById("confirmBtn").addEventListener("click", () => {
+
+// ----------------------------------------------------
+// 2. UPDATED CONFIRM & DIRECT TO SUPABASE
+// ----------------------------------------------------
+document.getElementById("confirmBtn").addEventListener("click", async () => {
     if (!selectedLocation.latitude || !selectedLocation.longitude) {
         alert("Please wait until a location is selected.");
         return;
     }
 
-    // Option A: If this picker is loaded inside an <iframe> on your main site
-    if (window.self !== window.top) {
-        window.parent.postMessage({
-            type: "LOCATION_SELECTED",
-            data: selectedLocation
-        }, "*"); 
-    } 
-    // Option B: If this is a direct web page redirect
-    else {
-        const parentUrl = `https://dasein.flutterflow.app/savenewaddress?lat=${selectedLocation.latitude}&lng=${selectedLocation.longitude}&address=${encodeURIComponent(selectedLocation.address)}`;
-        window.location.href = parentUrl;
+    if (!targetRowId) {
+        alert("Error: No row_id parameter found in the page URL.");
+        return;
+    }
+
+    // Replace these with your actual Supabase configurations
+    const SUPABASE_URL = "https://mzqdfesouqewriaivegu.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16cWRmZXNvdXFld3JpYWl2ZWd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzMTgwNzcsImV4cCI6MjA2NDg5NDA3N30.lZS6WZCei27C-VuLjZP3J3qSSAsE5kRBzbTI96-5cck";
+    const TABLE_NAME = "users"; 
+
+    // Make sure these object keys match your table's exact column names
+    const payload = {
+        lat: parseFloat(selectedLocation.latitude),
+        lng: parseFloat(selectedLocation.longitude),
+        address: selectedLocation.address || ""
+    };
+
+    try {
+        document.getElementById("confirmBtn").innerText = "Saving Location...";
+
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_NAME}?id=eq.${targetRowId}`, {
+            method: "PATCH", 
+            headers: {
+                "apikey": SUPABASE_ANON_KEY,
+                "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+                "Content-Type": "application/json",
+                "Prefer": "return=minimal"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            alert("Location saved successfully to database!");
+        } else {
+            const err = await response.json();
+            console.error("Supabase Error Details:", err);
+            alert("Database rejected the update. Check console.");
+        }
+    } catch (error) {
+        console.error("Network connectivity error:", error);
+        alert("Network error failed to connect to database.");
+    } finally {
+        document.getElementById("confirmBtn").innerText = "Confirm Location";
     }
 });
