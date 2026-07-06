@@ -238,7 +238,7 @@ document.getElementById("confirmBtn").addEventListener("click", async () => {
     try {
         document.getElementById("confirmBtn").innerText = "Saving Location...";
 
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_NAME}?id=eq.${targetRowId}`, {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_NAME}?useruuid=eq.${targetRowId}`, {
             method: "PATCH", 
             headers: {
                 "apikey": SUPABASE_ANON_KEY,
